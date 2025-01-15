@@ -1,0 +1,32 @@
+-- POSTGRESQL --
+start with: sudo systemctl start postgresql
+access pg command line:
+  log in as postgres user: sudo -iu postgres
+  launch terminal: psql
+changing auth model in /var/lib/postgres/data/pg_hba.conf:
+  use md5 for prod, peer ensures sys username matches role name, trust allows access to anyone
+granting all permissions to role (as postgres) because schema perms are different somehow:
+  GRANT ALL PRIVILEGES ON DATABASE [db] TO USER [user];
+  \c [db] postgres
+  GRANT ALL ON SCHEMA public TO [user];
+
+-- CURL --
+test local backend:
+  curl -X GET http://localhost:5000/api/blogs
+  curl -X POST http://localhost:5000/api/blogs -H "content-Type: application/json" -d '{"url": "...", "title": "...", "tags": ["...", "..."]}'
+  curl -X DELETE http://localhost:5000/api/blogs/[id]
+
+-- DOCKER --
+docker volume create postgres_data
+docker run -d --name postgres-db
+  -e POSTGRES_USER=superuser_name
+  -e POSTGRES_PASSWORD=superuser_password
+  -e POSTGRES_DB=database_name
+  -v postgres_data:/var/lib/postgresql/data
+  -p 5432:5432
+  postgres:17
+docker start postgres-db
+
+-- REACT --
+React automatically imports variables starting with REACT_APP_ from .env
+manifest.json is info for when app is installed on mobile or desktop
